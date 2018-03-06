@@ -1,0 +1,54 @@
+//------------------------------------------------
+//--- 010 Editor v8.0.1 Binary Template
+//
+//      File: DATA.bt
+//   Authors: TagnumElite
+//   Version: 0.1
+//   Purpose: Parse DATA files.
+//  Category: Games
+// File Mask: *.data
+//  ID Bytes: 
+//   History: 
+//-----------------------------------------------
+
+struct DATA {
+    struct {
+        int16 file_count <name="File Count">;
+    } header <name="Header">;
+    
+    local int version = 26;
+    
+    struct {
+        int32 file_id <name="File ID">;
+        int32 file_data_size <name="File Data Size">;
+        if ( !version == 25 )
+            int16 unknown <name="Unknown Signed 32 Int">;
+    } index_tables[data.header.file_count] <name="Index Tables">;
+    
+    local int i = 0;
+
+    struct {
+        for ( i = 0; i < data.header.file_count; i++ ) {
+            struct {
+                struct {
+                    int32 resource_type <name="Resource Type">;
+                    int32 file_size <name="File Size">;
+                    int32 file_name_size <name="File Name Size">;
+                    char  file_name[file_name_size] <name="File Name">;
+                } header <name="Header">;
+                
+                struct {
+                    byte  unknown <name="Unknown Byte">;
+                    
+                    if ( unknown == 1 ) {
+                        byte  unknown_bytes[3] <name="Unknown Bytes">;
+                        int32 unknown_count <name="Unknown Count">;
+                        int32 unknown_int[3*unknown_count] <name="Unknown Int">;
+                    }
+                    
+                    byte data_raw[header.file_size] <name="Raw Data">;
+                } file_data <name="File Data">;
+            } file_table <name="File Table">;
+        }
+    } files <name="Files">;
+};
