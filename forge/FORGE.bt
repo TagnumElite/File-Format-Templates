@@ -11,6 +11,18 @@
 //   History: 
 //-----------------------------------------------
 
+/*  Color Codes:
+cRed:    Unknown Byte
+cDkRed:  Unknown Bytes
+cWhite:  
+cBlack:  
+cPurple: 
+cAqua:   String
+cLtBlue: Int
+cBlue:   Int32
+cDkBlue: Int64
+*/
+
 #include "DATA.bt"
 
 typedef struct COMPRESSED_DATA_CHUNK (uint16 size) {
@@ -18,57 +30,74 @@ typedef struct COMPRESSED_DATA_CHUNK (uint16 size) {
     byte  compressed_data[size];
 };
 
+typedef struct BlockIndex {
+    uint16 uncompressed_size <name="Uncompressed Size", fgcolor=cLtBlue, bgcolor=cGreen>;
+    uint16 compressed_size <name="Compressed Size", fgcolor=cLtBlue, bgcolor=cRed>;
+};
+
 //I Don't how to tell the difference between the assassins creed.
 // So This just assumes ACRe for now
-typedef struct RAW_DATA_CHUNK {
+typedef struct RawDataChunk {
     struct {
-        int64 unknown1;
-        int16 unknown2;
-        byte  compression_type <name="Compression Type">;
-        int16 min_size <name="Min Size">;
-        int16 max_size <name="Max Size">;
-        int16 compressed_block_count <name="Compressed Block Count">;
+        int64 unknown1 <name="Unknown Signed 64 Int", fgcolor=cRed>;
+        int16 unknown2 <name="Unknown Signed 16 Int", fgcolor=cRed>;
+        byte  compression_type <name="Compression Type", fgcolor=cNone>;
+        int16 min_size <name="Min Size", fgcolor=cLtBlue>;
+        int16 max_size <name="Max Size", fgcolor=cLtBlue>;
+        int16 compressed_block_count <name="Compressed Block Count", fgcolor=cLtBlue>;
     } header <name="Header">;
+    
+    if ( header.compressed_block_count > 0 )
+        BlockIndex block_index[header.compressed_block_count] <name="Block Index">;
+    
+    local int i = 0;
+    
+    for ( i = 0; i < header.compressed_block_count; i++ ) {
+        CompressedDataChunk compressed_data_chunk(block_index[i].compressed_size) <name="Compressed Data Chunk">;
+    }
+    
+    // {
+    //
+    //} header_two;
+    //
+    //BlockIndex block_index_2;
+    //
+    //CompressedDataChunk compressed_data_chunk_2;
 };
 
-typedef struct BLOCK_INDEX {
-    uint16 uncompressed_size;
-    uint16 compressed_size;
-};
-
-typedef struct RAW_DATA_TABLE {
+typedef struct RawDataTable {
     if ( forge.header.version == 27 ) {
-        RAW_DATA_CHUNK raw_data_chunk;
+        RawDataChunk raw_data_chunk;
     } else {
-        char signature[8] <hidden=true>;
-        byte file_name[128] <name="File Name">;
-        byte unknown[255] <name="Unknown 255 Bytes">;
-        int32 file_id <name="File ID">;
-        int32 raw_size <name="Raw Data Size">;
-        int64 file_data_id <name="File Data ID">;
-        int32 unknown2[6] <name="Unknown Signed 32 Int">;
-        int32 timestamp <name="Timestamp">;
-        byte  unknown3[5] <name="Unknown 5 Bytes">;
-        RAW_DATA_CHUNK raw_data_chunk <name="Raw Data Chunk">;
+        char signature[8] <name="Signature", fgcolor=cAqua, hidden=true>;
+        byte file_name[128] <name="File Name", fgcolor=cAqua>;
+        byte unknown[255] <name="Unknown 255 Bytes", fgcolor=cRed>;
+        int32 file_id <name="File ID", fgcolor=cBlue>;
+        int32 raw_size <name="Raw Data Size", fgcolor=cBlue>;
+        int64 file_data_id <name="File Data ID", fgcolor=cDkBlue>;
+        int32 unknown2[6] <name="Unknown Signed 32 Int", fgcolor=cRed>;
+        int32 timestamp <name="Timestamp", fgcolor=cBlue>;
+        byte  unknown3[5] <name="Unknown 5 Bytes", fgcolor=cRed>;
+        RawDataChunk raw_data_chunk <name="Raw Data Chunk">;
     }
 };
 
-typedef struct NAME_TABLE {
+typedef struct NameTable {
     int32 raw_size <name="Raw Data Size", comment="Should match the raw data from the respective Index Table">;
     int64 file_id <name="File ID">;
-    int32 unknown[4] <name="Unknown Signed 32 Int">;
+    int32 unknown[4] <name="Unknown Signed 32 Int", fgcolor=cDkRed>;
     int32 next_file_count <name="Next File Count">;
     int32 prev_file_count <name="Previous File Count">;
-    int32 unknown2 <name="Unknown Signed 32 Int">;
+    int32 unknown2 <name="Unknown Signed 32 Int", fgcolor=cDkRed>;
     int32 timestamp <name="Timestamp">;
     byte  file_name[128] <name="File Name", comment="null-terminated file name">;
     if ( forge.header.version == 27 )
-        int32 unknown3[5] <name="Unknown Signed 32 Int">;
+        int32 unknown3[5] <name="Unknown Signed 32 Int", fgcolor=cRed>;
     else
-        int32 unknown3[4] <name="Unknown Signed 32 Int">;
+        int32 unknown3[4] <name="Unknown Signed 32 Int", fgcolor=cRed>;
 };
 
-typedef struct INDEX_TABLE {
+typedef struct IndexTable {
     int64 offset <name="Offset", comment="Offset to Raw Data Table">;
     if ( forge.header.version == 27 )
         int64 file_data <name="File Data ID">;
@@ -77,46 +106,54 @@ typedef struct INDEX_TABLE {
     int32 size <name="Raw Data Size">;
 };
 
-typedef struct FILE_DATA_HEADER {
-    int32 index_count <name="Index Count">;
-    int32 unknown <name="Unknown Signed 32 Int">;
+typedef struct FileDataHeader {
+    int32 index_count <name="Index Count", fgcolor=cBlue>;
+    int32 unknown <name="Unknown Signed 32 Int", fgcolor=cRed>;
     int64 offset_index <name="Index Table Offset">;
     int64 offset_file <name="File Data Offset", comment="-1 Means no extra File Data">;
     int32 index_start <name="Index Start">;
     int32 index_end <name="Index End">;
     int64 offset_name <name="Name Table Offset">;
-    int64 unknown_offset <name="Unknown Offset">;
+    int64 unknown_offset <name="Unknown Offset", fgcolor=cRed>;
 };
 
-typedef struct FILE_DATA {
-    FILE_DATA_HEADER header <name="Header", fgcolor=cWhite>;
-    
-    FSeek(header.offset_index);
-    INDEX_TABLE index_table[header.index_count] <name="Index Table", fgcolor=cGray, optimize=false>;
-    
-    FSeek(header.offset_name);
-    NAME_TABLE name_table[header.index_count] <name="Name Table", fgcolor=cRed, optimize=false>;
+typedef struct FileData {
+    FileDataHeader header <name="Header">;
     
     local int i = 0;
+    local int64 pos_index;
+    local int64 pos_name;
     
-    Printf("sizeof(index_table): %d; sizeof(header.index_count): %d;", sizeof(index_table), header.index_count);    
     struct {
-        for ( i = 0; i < header.index_count; i++ ) {
-            FSeek(index_table[i].offset);
-            RAW_DATA_TABLE raw_data_table <name="Raw Data Table">;
+        pos_index = header.offset_index;
+        pos_name = header.offset_name;
+        
+        for ( i = 0; i < header.index_count; i++) {
+            struct File {
+                FSeek(pos_index);
+                IndexTable index_table <name="Index Table", optimize=false>;
+                pos_index = FTell();
+                
+                FSeek(pos_name);
+                NameTable name_table <name="Name Table", optimize=false>;
+                pos_name = FTell();
+                
+                FSeek(index_table.offset);
+                RawDataTable raw_data_table <name="Raw Data Table">;
+            } file <name="File">;
         }
-    } raw_data_tables <name="Raw Data Tables">;
+    } files <name="Files">;
 };
 
 struct FORGE {
     struct {
-        char   sig[8] <hidden=true>;
-        byte   unknown <fgcolor=cDkYellow, name="Unknown Byte">;
-        int32  version <fgcolor=cLtGreen, name="Version">;
-        uint64 offset <fgcolor=cLtPurple, name="Offset", comment="Offset to File Data Handler">;
-        int32  unknown2 <fgcolor=cDkYellow, name="Unknown Signed 32 Int">;
-        byte   unknown3 <fgcolor=cDkYellow, name="Unknown Byte">;
-    } header <bgcolor=cBlack, name="Header">;
+        char   sig[8] <name="Signature", fgcolor=cAqua, hidden=true>;
+        byte   unknown <name="Unknown Byte", fgcolor=cRed>;
+        int32  version <name="Version", fgcolor=cBlue>;
+        uint64 offset <name="Offset", fgcolor=cDkBlue, comment="Offset to File Data Handler">;
+        int32  unknown2 <name="Unknown Signed 32 Int", fgcolor=cRed>;
+        byte   unknown3 <name="Unknown Byte", fgcolor=cDkRed>;
+    } header <name="Header", bgcolor=cGray>;
     
     FSeek(forge.header.offset);
     
@@ -124,33 +161,28 @@ struct FORGE {
         int32 total <name="Total File Count">;
 
         if ( forge.header.version == 27 )
-            int32 unknown[4] <name="Unknown Signed 32 Int">;
+            int32 unknown[4] <name="Unknown Signed 32 Int", fgcolor=cRed>;
         else
-            int32 unknown[3] <name="Unknown Signed 32 Int">;
+            int32 unknown[3] <name="Unknown Signed 32 Int", fgcolor=cRed>;
         
         if ( forge.header.version == 26 ) {
-            int32 unknown_total <name="Unknown Signed 32 Int", comment="">;
-            int32 unknown2 <name="Unknown Signed 64 Int">;
+            int32 unknown_total <name="Unknown Signed 32 Int", comment="", fgcolor=cDkRed>;
+            int32 unknown2 <name="Unknown Signed 64 Int", fgcolor=cRed>;
         } else {
-            int64 unknown2 <name="Unknown Signed 64 Int">;
+            int64 unknown2 <name="Unknown Signed 64 Int", fgcolor=cDkRed>;
         }
             
         int32 max <name="Maximum Files", comment="Maximum number of files for this index">;
-        int32 unknown3 <name="Unknown Signed 32 Int">;
+        int32 unknown3 <name="Unknown Signed 32 Int", fgcolor=cRed>;
         int64 offset <name="Offset", comment="Offset to File Data">;
-    } header_data <bgcolor=cGray, name="Header Data">;
+    } header_data <name="Header Data">;
     
     FSeek(forge.header_data.offset);
     
     local int i;
     
-    struct {
-        // Uncomment For Now
-        //for ( i = 0; i < forge.header_data.total; i++ ) {
-            FILE_DATA file_data <name="File Data", bgcolor=cDkGreen>;
-        //}
-        //TODO: ORGANIZE EACH FILE
-        //struct {
-        //} file;
-    } files <name="Files">;
+    
+    //for ( i = 0; i < forge.header_data.total; i++ ) {
+        FileData file_data <name="File Data">;
+    //}
 } forge <open=true, name="Forge">;
