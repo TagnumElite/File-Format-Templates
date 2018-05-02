@@ -25,8 +25,8 @@ cDkBlue: Int64
 
 #include "DATA.bt"
 
-typedef struct COMPRESSED_DATA_CHUNK (uint16 size) {
-    int32 checksum;
+typedef struct CompressedDataChunk (uint16 size) {
+    int32 checksum <name="Checksum", fgcolor=cBlue>;
     byte  compressed_data[size];
 };
 

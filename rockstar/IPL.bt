@@ -1,0 +1,64 @@
+//------------------------------------------------
+//--- 010 Editor v8.0.1 Binary Template
+//
+//      File: IPL.bt
+//   Authors: TagnumElite
+//   Version: 0.1
+//   Purpose: 
+//  Category: 
+// File Mask: *.ipl
+//  ID Bytes: 62 6E 72 79
+//   History: 
+//------------------------------------------------
+
+typedef struct INST {
+    float  pos_x;
+    float  pos_y;
+    float  pos_z;
+    float  rot_x;
+    float  rot_y;
+    float  rot_z;
+    float  rot_w;
+    int32  id;
+    int32  interior_flags;
+    uint32 flags;
+};
+
+typedef struct CARS {
+    float pos_x;
+    float pos_y;
+    float pos_z;
+    float angle;
+    int32 id;
+    int32 flags[7];
+};
+
+struct ItemPlacementList {
+    SetColor(cBlack, cWhite);
+    char  signature[4];
+    int32 item_instances;
+    int32 unknown1;
+    int32 unknown2;
+    int32 unknown3;
+    int32 parked_cars;
+    int32 unknown4;
+    int32 item_offset;
+    int32 unused_size;
+    int32 unknown1_offset;
+    int32 unused_size;
+    int32 unknown2_offset;
+    int32 unused_size;
+    int32 unknown3_offset;
+    int32 unused_size;
+    int32 parked_cars_offset;
+    int32 unused_size;
+    int32 unknown4_offset;
+    int32 unused_size;
+    
+    local int32 pos = FTell();
+    FSeek(item_offset);
+    INST items[item_instances];
+    FSeek(parked_cars_offset);
+    CARS cars[parked_cars];
+    FSeek(pos);
+} ipl;
