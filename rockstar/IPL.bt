@@ -5,13 +5,13 @@
 //   Authors: TagnumElite
 //   Version: 0.1
 //   Purpose: 
-//  Category: 
+//  Category: Game
 // File Mask: *.ipl
 //  ID Bytes: 62 6E 72 79
 //   History: 
 //------------------------------------------------
 
-typedef struct INST {
+typedef struct {
     float  pos_x;
     float  pos_y;
     float  pos_z;
@@ -22,16 +22,16 @@ typedef struct INST {
     int32  id;
     int32  interior_flags;
     uint32 flags;
-};
+} INST <size=40>;
 
-typedef struct CARS {
+typedef struct {
     float pos_x;
     float pos_y;
     float pos_z;
     float angle;
     int32 id;
     int32 flags[7];
-};
+} CARS <size=48>;
 
 struct ItemPlacementList {
     SetColor(cBlack, cWhite);
