@@ -39,11 +39,6 @@ string FileTypeRead (int file_type) {
     return s;
 };
 
-// Enums //
-
-local char GMST[4] = 'GMST';
-local char GLOB[4] = 'GLOB';
-
 // structs //
 
 typedef struct {
@@ -100,15 +95,12 @@ struct {
         }
         struct Form {
             Record record;
-            switch (record.type) {
-                case GMST:
-                    SubRecord name;
-                    if (record.size != (name.size + 8))
-                        SubRecord value;
-                    break;
-                default:
-                    byte value[record.size];
-                    break;
+            if (record.size > 0) {
+                local int cur_size = record.size;
+                while (cur_size != 0) {
+                    SubRecord subrecord;
+                    cur_size = cur_size - (8 + subrecord.size);
+                }
             }
         } form;
     }
