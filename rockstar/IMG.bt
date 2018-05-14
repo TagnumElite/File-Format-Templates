@@ -1,0 +1,26 @@
+//------------------------------------------------
+//--- 010 Editor v8.0.1 Binary Template
+//
+//      File: IMG.bt
+//   Authors: TagnumElite
+//   Version: 0.1
+//   Purpose: Parse Rockstar IMG files.
+//  Category: Game
+// File Mask: *.img
+//  ID Bytes: 
+//   History: 
+//-----------------------------------------------
+
+#include "DIR.bt";
+
+struct Header {
+    char version[4];
+    int  object_count;
+} header <size=8>;
+
+struct DirectoryEntry {
+    int   offset;
+    short stream_size;
+    short size;
+    char  name[24];
+} dir_entries[header.object_count];

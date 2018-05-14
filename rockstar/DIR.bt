@@ -1,0 +1,19 @@
+//------------------------------------------------
+//--- 010 Editor v8.0.1 Binary Template
+//
+//      File: DIR.bt
+//   Authors: TagnumElite
+//   Version: 0.1
+//   Purpose: Parse Rockstar DIR files.
+//  Category: Game
+// File Mask: *.dir
+//  ID Bytes: 
+//   History: 
+//-----------------------------------------------
+
+typedef struct File {
+    uint offset;
+    uint size;
+    char name[24];
+}
+
