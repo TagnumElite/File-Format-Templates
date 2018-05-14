@@ -3,41 +3,14 @@
 //
 //      File: ESP.bt
 //   Authors: TagnumElite
-//   Version: 0.0.1
+//   Version: 0.1.1
 //   Purpose: Parse Bethesda Master/Plugin/Save files
 //  Category: Game
 // File Mask: *.esp, *.esm, *.esl, *.ess
 //  ID Bytes: 54 45 53
 //   History: 
-//   0.0.1   Morrowind Support
+//   0.1.1   Morrowind ESP Support Basic
 //------------------------------------------------
-
-// Local Variables //
-
-local int i = 0;
-
-// Functions //
-
-string FileTypeRead (int file_type) {
-    string s;
-    string type;
-    switch (file_type) {
-        case 0:
-            type = "ESP";
-            break;
-        case 1:
-            type = "ESM";
-            break;
-        case 32:
-            type = "ESS";
-            break;
-        default:
-            type = "Unknown";
-            break;
-    };
-    SPrintf(s, "%s", type);
-    return s;
-};
 
 // structs //
 
@@ -54,37 +27,10 @@ typedef struct {
     byte value[size];
 } SubRecord;
 
-typedef struct {
-    char  type[4] <name="Subrecord Type">;
-    int   size <name="Size">;
-    float version <name="Version">;
-    int   file_type <read=FileTypeRead, name="File Type">;
-    char  author[32] <name="Author">;
-    char  description[260] <name="Description">;
-} HEDR;
-
-typedef struct {
-    local char tes3[4] = 'TES3';
-    char type[4];
-    int  size <name="Size">;
-    if (Stricmp(type, tes3)) {
-        int  header <name="Header">;
-        int  flags <name="Flags">;
-    } else {
-        int flags;
-        int id;
-        int revision;
-        int version;
-    }
-} Head;
-
 // File //
 
-Head head <name="Head">;
-HEDR header <name="Header">;
-
 struct {
-    local int pos = 0;
+    local int pos = 1;
 
     while (!FEof()) {
         if (pos == FTell()) {
@@ -102,6 +48,12 @@ struct {
                     cur_size = cur_size - (8 + subrecord.size);
                 }
             }
-        } form;
+        } form <name=FormName>;
     }
 } forms <name="Forms">;
+
+string FormName (struct Form form) {
+    string s;
+    SPrintf(s, "%c", form.record.type);
+    return s;
+}
