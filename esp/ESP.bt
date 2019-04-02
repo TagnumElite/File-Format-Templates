@@ -52,8 +52,8 @@ struct {
     }
 } forms <name="Forms">;
 
-string FormName (struct Form form) {
+string FormName (Form& form) {
     string s;
-    SPrintf(s, "%c", form.record.type);
+    SPrintf(s, "%c%c%c%c", form.record.type[0], form.record.type[1], form.record.type[2], form.record.type[3]);
     return s;
 }

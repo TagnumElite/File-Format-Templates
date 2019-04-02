@@ -7,7 +7,7 @@
 //   Purpose: Parse Rockstar IMG files.
 //  Category: Game
 // File Mask: *.img
-//  ID Bytes: 
+//  ID Bytes: 56 45 52
 //   History: 
 //-----------------------------------------------
 

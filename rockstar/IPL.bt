@@ -12,53 +12,79 @@
 //------------------------------------------------
 
 typedef struct {
-    float  pos_x;
-    float  pos_y;
-    float  pos_z;
-    float  rot_x;
-    float  rot_y;
-    float  rot_z;
-    float  rot_w;
+    float  x;
+    float  y;
+    float  z;
+} Vector <name=VectorName>;
+
+typedef struct {
+    float  x;
+    float  y;
+    float  z;
+    float  w;
+} Quaternion <name=QuaternionName>;
+
+string VectorName(Vector &vec) {
+    return "Vector: ";
+}
+
+string QuaternionName(Quaternion &quat) {
+    return "Quaternion: ";
+}
+
+typedef struct {
+    Vector position;
+    Quaternion rotation;
     int32  id;
     int32  interior_flags;
     uint32 flags;
-} INST <size=40>;
+} Item <name=ItemName, size=40>;
+
+string ItemName(Item &item) {
+    string s = "";
+    SPrintf(s, "Item: %i", item.id);
+    return s;
+}
 
 typedef struct {
-    float pos_x;
-    float pos_y;
-    float pos_z;
+    Vector position;
     float angle;
     int32 id;
     int32 flags[7];
-} CARS <size=48>;
+} Car <name=CarName, size=48>;
+
+string CarName(Car &car) {
+    string s = "";
+    SPrintf(s, "Car: %i", car.id);
+    return s;
+}
 
 struct ItemPlacementList {
     SetColor(cBlack, cWhite);
-    char  signature[4];
-    int32 item_instances;
-    int32 unknown1;
-    int32 unknown2;
-    int32 unknown3;
-    int32 parked_cars;
-    int32 unknown4;
-    int32 item_offset;
-    int32 unused_size;
-    int32 unknown1_offset;
-    int32 unused_size;
-    int32 unknown2_offset;
-    int32 unused_size;
-    int32 unknown3_offset;
-    int32 unused_size;
-    int32 parked_cars_offset;
-    int32 unused_size;
-    int32 unknown4_offset;
-    int32 unused_size;
+    char  signature[4] <name="Signature", hidden=true>;
+    int32 item_instances <name="Item Count">;
+    int32 unknown1 <hidden=true>;
+    int32 unknown2 <hidden=true>;
+    int32 unknown3 <hidden=true>;
+    int32 parked_cars <name="Car Count">;
+    int32 unknown4 <hidden=true>;
+    int32 item_offset <name="Item Offset">;
+    int32 unused_size <hidden=true>;
+    int32 unknown1_offset <hidden=true>;
+    int32 unused_size <hidden=true>;
+    int32 unknown2_offset <hidden=true>;
+    int32 unused_size <hidden=true>;
+    int32 unknown3_offset <hidden=true>;
+    int32 unused_size <hidden=true>;
+    int32 parked_cars_offset <name="Car Offset">;
+    int32 unused_size <hidden=true>;
+    int32 unknown4_offset <hidden=true>;
+    int32 unused_size <hidden=true>;
     
     local int32 pos = FTell();
     FSeek(item_offset);
-    INST items[item_instances];
+    Item items[item_instances];
     FSeek(parked_cars_offset);
-    CARS cars[parked_cars];
+    Car cars[parked_cars];
     FSeek(pos);
-} ipl;
+} ipl <name="Item Placement List">;
