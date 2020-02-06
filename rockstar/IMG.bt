@@ -13,14 +13,35 @@
 
 #include "DIR.bt";
 
-struct Header {
-    char version[4];
-    int  object_count;
-} header <size=8>;
+local int sector_size = 2048;
 
-struct DirectoryEntry {
-    int   offset;
-    short stream_size;
-    short size;
-    char  name[24];
-} dir_entries[header.object_count];
+struct IMG {
+    struct Header {
+        char version[4];
+        int  object_count;
+    } header <name="Header", size=8>;
+    
+    struct DirectoryEntry {
+        int   offset;
+        short stream_size;
+        short size;
+        char  name[24];
+    } dir_entries[header.object_count] <name="Dir Entries">;
+    
+    local int i;
+    for (i = 0; i < header.object_count; i++ ) {
+        FSeek(dir_entries[i].offset * sector_size);
+        struct {
+            byte file[dir_entries[i].stream_size * sector_size];
+        } file <name = "Raw File">;
+    }
+} img <name=IMGName>;
+
+string IMGName( IMG &i ) {
+    string s;
+    string var = "";
+    var += i.header.version;
+    SPrintf( s, "IMG (%s) (%i)", var, i.header.object_count );
+    return s;
+}
+
