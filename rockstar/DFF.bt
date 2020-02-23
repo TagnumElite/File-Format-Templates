@@ -1,0 +1,100 @@
+//------------------------------------------------
+//--- 010 Editor v8.0.1 Binary Template
+//
+//      File: DFF.bt
+//   Authors: TagnumElite
+//   Version: 0.1
+//   Purpose: Parse Rockstar RenderWare Files
+//  Category: Game
+// File Mask: *.dff
+//  ID Bytes: 10 00 00 00
+//   History: 
+//------------------------------------------------
+
+#include "RenderWare.bt"
+
+uint PeekType() {
+    local int64 start = FTell();
+    local uint type = ReadUInt();
+    FSeek(start);
+    return type;
+}
+
+typedef struct {
+    HeaderInfo header;
+    uint count;
+    byte data[header.size - 4];
+} Data;
+
+typedef struct {
+    HeaderInfo header;
+    local int pos = FTell();
+    // DATA HERE
+    FSeek(pos + header.size);
+} Extension;
+
+typedef struct {
+    Matrix3 rotation;
+    Vector3 position;
+    int parent;
+    int flags;
+} Frame;
+
+typedef struct {
+    HeaderInfo header;
+    local int64 pos = FTell();
+    Data data;
+    local int64 pos2 = FTell();
+    FSeek(pos + 16);
+    Frame frames[data.count];
+    FSeek(pos2);
+    Extension extensions[data.count];
+    FSeek(pos + header.size);
+} FrameList;
+
+typedef struct {
+    HeaderInfo header;
+    local int64 pos = FTell();
+    Data data;
+    FSeek(pos + header.size);
+} Geometry;
+
+typedef struct {
+    HeaderInfo header;
+    local int64 pos = FTell();
+    Data data;
+
+    Geometry geometry[data.count];
+    FSeek(pos + header.size);
+} GeometryList;
+
+typedef struct {
+    HeaderInfo header;
+    local int64 pos = FTell();
+    Data data;
+    Extension extension;
+    FSeek(pos + header.size);
+} Atomic;
+
+typedef struct {
+    HeaderInfo header;
+    local int64 pos = FTell();
+    Data data;
+
+    if (data.header.build > 0x330000) {
+        int light_count;
+        int camera_count;
+    }
+
+    FrameList frame_list;
+    GeometryList geometry_list;
+    Atomic atomic[data.count];
+
+    Extension extension;
+    //FSeek(pos + header.size);
+} Clump;
+
+struct {
+    Clump clump;
+} RenderWare <name="RenderWare binary stream">;
+

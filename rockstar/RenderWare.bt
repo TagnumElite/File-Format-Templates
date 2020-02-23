@@ -1,0 +1,76 @@
+//------------------------------------------------
+//--- 010 Editor v10.0 Binary Template
+//
+//      File: 
+//   Authors: 
+//   Version: 
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+typedef struct {
+    float u;
+    float v;
+} UV;
+
+typedef struct {
+    byte r;
+    byte g;
+    byte b;
+    byte a;
+} Colour;
+
+
+typedef struct {
+    float x;
+    float y;
+    float z;
+} Vector3;
+
+
+typedef struct {
+    Vector3 x;
+    Vector3 y;
+    Vector3 z;
+} Matrix3;
+
+
+typedef enum <uint> {
+    ANY = -1,
+    NONE = 0,
+    DATA = 1,
+    STRING = 2,
+    EXTENSION = 3,
+    TEXTURE = 6,
+    MATERIAL = 7,
+    MATERIAL_LIST = 8,
+    FRAME_LIST = 14,
+    GEOMETRY = 15,
+    CLUMP = 16,
+    ATOMIC = 20,
+    GEOMETRYLIST = 26,
+    MATERIALSPLIT = 1294,
+    FRAME = 39056126
+} SectionType;
+
+typedef struct {
+    SectionType type;
+    uint size;
+    uint version;
+    local uint build;
+    if ((version & 0xFFFF0000) == 0) {
+        build = version << 8;
+    } else {
+        local int p1 = ((version >> 14) & 0x3FF00) + 0x30000;
+        local int p2 = (version >> 16) & 0x3F;
+        build = p1 | p2;
+    }
+} HeaderInfo;
+
+typedef struct {
+    HeaderInfo header;
+    local int64 pos = FTell();
+} Section;
